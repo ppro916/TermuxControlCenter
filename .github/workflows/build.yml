@@ -1,0 +1,53 @@
+name: Android Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download Android SDK
+        run: |
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          mkdir -p $HOME/Android/cmdline-tools
+          unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/Android/cmdline-tools
+          mv $HOME/Android/cmdline-tools/cmdline-tools $HOME/Android/cmdline-tools/latest
+
+      - name: Set PATH
+        run: |
+          echo "export ANDROID_HOME=$HOME/Android" >> $GITHUB_ENV
+          echo "export PATH=\$PATH:\$HOME/Android/cmdline-tools/latest/bin:\$HOME/Android/platform-tools" >> $GITHUB_ENV
+
+      - name: Accept SDK licenses
+        run: yes | $HOME/Android/cmdline-tools/latest/bin/sdkmanager --licenses
+
+      - name: Install SDK packages
+        run: |
+          $HOME/Android/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: termux-control-center-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
