@@ -4,18 +4,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // Use a stable AGP version available in Maven Central
+        // AGP version stable for GitHub Actions
         classpath "com.android.tools.build:gradle:8.0.2"
     }
 }
 
 allprojects {
     repositories {
-        //google()
+        google()
         mavenCentral()
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
