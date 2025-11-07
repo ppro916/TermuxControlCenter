@@ -1,4 +1,3 @@
-
 - name: Build APK
   run: ./gradlew :app:assembleDebug
   
