@@ -1,5 +1,7 @@
-name: Android Build
 
+- name: Build APK
+  run: ./gradlew :app:assembleDebug
+  
 on:
   push:
     branches:
